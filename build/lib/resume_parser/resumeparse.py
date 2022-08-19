@@ -267,6 +267,7 @@ class resumeparse(object):
             
         try:
             raw_text = parser.from_file(pdf_file, service='text')['content']
+            raw_text = raw_text.replace('\u200b' or '\n' or ' ', '')
         except RuntimeError as e:            
             logging.error('Error in tika installation:: ' + str(e))
             logging.error('--------------------------')
@@ -550,7 +551,7 @@ class resumeparse(object):
         except:
             try:
                 return re.search(
-                    r'(\d{3}[-\.\s]??\d{3}[-\.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-\.\s]??\d{4}|\d{3}[-\.\s]??\d{4})',
+                    r'(\d{3}[-\.\s]??\d{3}[-\.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-\.\s]??\d{4}|\d{5}[-\.\s]??\d{5})',
                     text).group()
             except:
                 return ""
