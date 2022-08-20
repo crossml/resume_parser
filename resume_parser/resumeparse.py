@@ -21,6 +21,7 @@ import nltk
 # nltk.download('brown')
 
 import re
+import ast
 import os
 from datetime import date
 
@@ -267,7 +268,7 @@ class resumeparse(object):
             
         try:
             raw_text = parser.from_file(pdf_file, service='text')['content']
-            raw_text = raw_text.replace('\u200b' or '\n' or ' ', '')
+            
         except RuntimeError as e:            
             logging.error('Error in tika installation:: ' + str(e))
             logging.error('--------------------------')
@@ -284,18 +285,21 @@ class resumeparse(object):
             full_string = re.sub(r'\n+', '\n', raw_text)
             full_string = full_string.replace("\r", "\n")
             full_string = full_string.replace("\t", " ")
-
+           
             # Remove awkward LaTeX bullet characters
-
+          
+            
             full_string = re.sub(r"\uf0b7", " ", full_string)
             full_string = re.sub(r"\(cid:\d{0,2}\)", " ", full_string)
             full_string = re.sub(r'• ', " ", full_string)
 
             # Split text blob into individual lines
             resume_lines = full_string.splitlines(True)
-
             # Remove empty strings and whitespaces
             resume_lines = [re.sub('\s+', ' ', line.strip()) for line in resume_lines if line.strip()]
+            # Remove the unicode spaces 
+            resume_lines = re.sub(r"(\\[u]\S\d\S\S)", "", str(resume_lines), 0, re.MULTILINE)
+            resume_lines = ast.literal_eval(resume_lines)
 
             return resume_lines, raw_text
         except Exception as e:
